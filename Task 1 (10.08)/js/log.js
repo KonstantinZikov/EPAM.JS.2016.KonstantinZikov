@@ -3,10 +3,10 @@ window.onload = function () {
     data.forEach(function (current, index, arr) {
         var output = "data[" + index + "]=";
         if (current === undefined) {
-            console.log(output + "не определено");
+            console.log(output + "РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ");
         }
         else if (current === null) {
-            console.log(output + "не указано");
+            console.log(output + "РЅРµ СѓРєР°Р·Р°РЅРѕ");
         }
         else {
             console.log(output + current);
