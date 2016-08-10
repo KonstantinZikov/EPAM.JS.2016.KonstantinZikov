@@ -1,4 +1,4 @@
-console.log("init.js loaded.");
+﻿console.log("init.js loaded.");
 var data = [];
 data[0] = 120;
 data[1] = "40";

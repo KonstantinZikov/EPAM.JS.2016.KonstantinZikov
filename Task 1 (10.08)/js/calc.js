@@ -1,18 +1,18 @@
-console.log("calc.js loaded.");
-data.forEach(function (current, index, arr) {
-    if (current !== null && current !== undefined)
+﻿console.log("calc.js loaded.");
+for (var i = 0; i < data.length; i++){
+    if (data[i] !== null && data[i] !== undefined)
     {
-        var number = Number(arr[index]);
+        var number = Number(data[i]);
         if (number != NaN) {
-            if (current == 0) {
-                arr[index] = number + 10;
+            if (data[i] == 0) {
+                data[i] = number + 10;
             }
-            else if (current > 100) {
-                arr[index] = number - 100;
+            else if (data[i] > 100) {
+                data[i] = number - 100;
             }
-            else if (current < 100) {
-                arr[index] = number + 100;
+            else if (data[i] < 100) {
+                data[i] = number + 100;
             }
         }           
     }       
-});
+}

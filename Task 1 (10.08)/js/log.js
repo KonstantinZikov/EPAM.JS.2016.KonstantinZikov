@@ -1,15 +1,15 @@
-console.log("log.js loaded.");
+п»їconsole.log("log.js loaded.");
 window.onload = function () {
-    data.forEach(function (current, index, arr) {
-        var output = "data[" + index + "]=";
-        if (current === undefined) {
-            console.log(output + "не определено");
+    for (var i = 0; i < data.length; i++){
+        var output = "data[" + i + "]=";
+        if (data[i] === undefined) {
+            console.log(output + "РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ");
         }
-        else if (current === null) {
-            console.log(output + "не указано");
+        else if (data[i] === null) {
+            console.log(output + "РЅРµ СѓРєР°Р·Р°РЅРѕ");
         }
         else {
-            console.log(output + current);
+            console.log(output + data[i]);
         }
-    });
+    }
 };
