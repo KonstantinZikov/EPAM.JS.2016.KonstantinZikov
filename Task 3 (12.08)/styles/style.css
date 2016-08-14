@@ -1,0 +1,49 @@
+*{
+    padding:0;
+    margin:0;
+}
+
+body{
+    background-color:gray;
+}
+
+.container{
+    width:50%;
+    min-width:400px;
+    margin:auto;
+    margin-top:200px;
+    background-color:white;
+    overflow:hidden;
+    padding:5px;
+}
+
+.field{
+    width:80%;
+    height:300px;
+    border: solid black 2px;
+    float:left;
+}
+
+.block{
+    width:calc(100%/12 - 2px);
+    height:calc(100%/6 - 2px);
+    border:1px solid white;
+    float:left;
+    display:table-cell;
+    text-align:center;
+}
+
+.buttons {
+     width:18%;
+     float:left;
+}
+
+.buttons *{
+    width:90%;
+    margin: 0 5% 5% 5%;
+    padding:2%;
+    cursor:pointer;
+    border: solid gray 1px;
+    text-align:center;
+
+}
