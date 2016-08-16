@@ -1,5 +1,6 @@
 $(function () {
-
+    
+    // Main game object. Contains references to game-object-divs and game params.
     var game = {
         started: false,
         pause: false,
@@ -32,6 +33,8 @@ $(function () {
         blockRows: 0,
         blockCols: 0,
         blocksLeft: 0,
+
+        // blocks are stored in 2d array
         blocks: [],
 
         borders: {
@@ -41,6 +44,7 @@ $(function () {
             right: 0,            
         },
       
+        // Place game blocks to document body
         generateBlocks: function () {
             this.blocksLeft = this.blockCols * this.blockRows;
             var percent = this.height / 100;
@@ -57,6 +61,7 @@ $(function () {
             }            
         },
 
+        // Drop game params to default values
         drop:function () {        
             this.$score.text(0);
             this.score = 0;
@@ -74,6 +79,7 @@ $(function () {
         }      
     }
 
+    // Initialize game
     function initState() {
         //init jquery objects
         game.$body = $("body");
@@ -102,11 +108,12 @@ $(function () {
         game.bord.x = pxToNumber(game.bord.$.css("left"));
               
         // init blocks
-        game.blockRows = 1;
+        game.blockRows = 3;
         game.blockCols = 10;
         game.generateBlocks();              
     }
 
+    // Save sizes of game objects. It is required when the game is initialized or window is resized. 
     function initSizes() {
         // init window
         game.height = game.$window.height();
@@ -126,12 +133,11 @@ $(function () {
         game.borders.left = 0;
     }
 
-    initState();
-
-    window.onresize = function(event) {
+    window.onresize = function (event) {
         initSizes();
     };
 
+    // bord control with the mouse
     function mouse(e) {
         if (!game.pause)
         {
@@ -147,6 +153,7 @@ $(function () {
         }
     }
 
+    // initiated when user clicks to bord
     function bordClick(){
         if (!game.isWon) {
             if (game.started) {
@@ -169,6 +176,7 @@ $(function () {
         }
     }
 
+    // button restart pressed
     function restart() {
         game.blocks.forEach(function (value, index, arr) {
             value.forEach(function ($value, $index, $arr) {
@@ -180,15 +188,23 @@ $(function () {
         game.drop();       
     }
 
+    initState();
     $(".restart").on("click", restart);
     $(".restart-won").on("click", restart);
     $("*").mousemove(mouse);
     game.bord.$.on("click", bordClick);
 
-    function ballMove() {       
+
+
+    // actions with the ball within one game tick
+    function ballMove() {
+        // calculate next ball coordinates
         var newX = game.ball.x + game.ball.horizontalSpeed;
         var newY = game.ball.y + game.ball.verticalSpeed;
+
         checkBlock(newX, newY);
+
+        // if ball hits any border, his direction must be changed
         if (newX < game.borders.left) {
             newX = game.borders.left;
             game.ball.horizontalSpeed *= -1;
@@ -204,6 +220,7 @@ $(function () {
             game.ball.verticalSpeed *= -1;
         }
 
+        // Check a bord in bottom border
         if (newX >= (game.bord.x - game.ball.diameter) && newX <= (game.bord.x + game.bord.width)){
             if (newY >= (game.borders.bottom - game.bord.height) && game.ball.verticalSpeed > 0){
                 game.ball.verticalSpeed *= -1;
@@ -213,7 +230,8 @@ $(function () {
         if (newY > game.borders.bottom) {
             if (newX < (game.borders.bottom - game.ball.diameter) ||
                 newX > (game.bord.x + game.bord.width)) {
-                minusCount();
+                // if ball hits the bottom border (not the bord), decrease the score 
+                minusScore();
             }
 
             newY = game.borders.bottom - game.ball.diameter;
@@ -226,11 +244,13 @@ $(function () {
         game.ball.$.css("left", game.ball.x);
         game.ball.$.css("top", game.ball.y);
 
+        // queue the next game tick
         if (!game.pause && game.started) {
             setTimeout(ballMove, game.speed);
         }        
     }
 
+    // Search block in selected coordinates
     function checkBlock(x, y) {
         if (x < 0){
             x = 0;
@@ -250,7 +270,7 @@ $(function () {
                 game.blocks[xCell][yCell].block.remove();
                 game.ball.verticalSpeed *= -1;
                 game.blocksLeft--;
-                plusCount();
+                plusScore();
             }
 
             if (game.blocksLeft == 0){
@@ -259,12 +279,14 @@ $(function () {
         }
     }
 
-    function plusCount() {
+    // the ball hit the block
+    function plusScore() {
         game.score++;
         game.$score.text(game.score);
     }
 
-    function minusCount() {
+    // the ball hit the bottom
+    function minusScore() {
         game.score -= 2;
         if (game.score < 0) {
             game.score = 0;
@@ -272,6 +294,7 @@ $(function () {
         game.$score.text(game.score);
     }
 
+    // action initiated when all blocks are destroyed
     function won() {       
         game.started = false;
         game.isWon = true;
@@ -282,6 +305,7 @@ $(function () {
     
 });
 
+// transform "15px" to 15 (as a number)
 function pxToNumber(px) {
     return Number(px.substring(0, px.length - 2));
 }
