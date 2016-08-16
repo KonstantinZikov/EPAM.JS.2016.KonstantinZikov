@@ -11,7 +11,7 @@ $(function () {
     };
 
     var blocks = [];
-    var finish = false;
+    var pause = false;
     var $bord = $(".bord");
     var width = $bord.width();
     var shift = width / 2;
@@ -22,9 +22,41 @@ $(function () {
     var started = false;
     var blocksLeft = 0;
 
+    function dropValues() {        
+        $(".count").text(0);
+        started = false;
+        pause = false;
+        isWon = false;
+        hSpeed = 0;
+        vSpeed = 0;
+        $(".bord").text("Start");
+        $ball.hide();
+        $ball.css("left", ballStartX);
+        $ball.css("top", ballStartY);
+        ballX = ballStartX;
+        ballY = ballStartY;
+    }
+
+    function restart() {
+        blocks.forEach(function (value, index, arr) {
+            value.forEach(function ($value, $index, $arr) {
+                $value.block.remove();
+            });
+        });
+        $(".won").hide();
+        generateBlocks();
+        dropValues();       
+    }
+
+    $(".restart").on("click", function () {
+        restart();
+    });
+    $(".restart-won").on("click", function () {
+        restart();
+    });
 
     $("*").mousemove(function (e) {
-        if (!finish)
+        if (!pause)
         {
             var x = e.clientX;
             bordSpeed = (x - shift) - bordPosition;
@@ -42,42 +74,44 @@ $(function () {
 
     var hSpeed = 0;
     var vSpeed = 0;
-
+    var isWon = false;
     var bottomBorder = $(window).height() - bordHeight;
     var topBorder = 60;
     var leftBorder = 0;
     var rightBorder = $(window).width();
     generateBlocks()
     $(".bord").on("click", function () {
-        if (started) {
-            if (!finish) {
-                $(".bord").text("Resume");
-                finish = true;
+        if (!isWon)
+        {
+            if (started) {
+                if (!pause) {
+                    $(".bord").text("Resume");
+                    pause = true;
+                }
+                else {
+                    $(".bord").text("Pause");
+                    pause = false;
+                    setTimeout(ballMove, gameSpeed)
+                }
             }
             else {
+                started = true;
                 $(".bord").text("Pause");
-                finish = false;
-                setTimeout(ballMove, gameSpeed)
+                hSpeed = 20;
+                vSpeed = 20;
+                setTimeout(ballMove, gameSpeed);
+                setTimeout(function () {
+                    $ball.show();
+                }, 100);
             }
-        }
-        else {
-            started = true;
-            $(".bord").text("Pause");
-            hSpeed = 20;
-            vSpeed = 20;
-            setTimeout(ballMove, gameSpeed);
-            setTimeout(function () {
-                $ball.show();
-            }, 100);
-        }
-        
+        }            
     });
-
-
 
     var $ball = $(".ball");
     var ballX = cut($ball.css("left"));
     var ballY = cut($ball.css("top"));
+    var ballStartX = ballX;
+    var ballStartY = ballY;
     var ballDm = $ball.height();
 
     var gameSpeed = 10;
@@ -118,18 +152,18 @@ $(function () {
         $ball.css("left", ballX);
         $ball.css("top", ballY);
 
-        if (!finish)       {
+        if (!pause && started) {
             setTimeout(ballMove, gameSpeed);
         }
         
     }
 
     function generateBlocks() {
-        blocksLeft = 10 * 6;
+        blocksLeft = 10 * 1;
         var part = ($(window).height()) / 100;
         for (var i = 0; i < 10; i++) {
             blocks[i] = [];
-            for (var j = 0; j < 6; j++) {
+            for (var j = 0; j < 1; j++) {
                 var $block = $("<div>");
                 $block.addClass("block");
                 $block.css("left", i * 10 + "%");
@@ -152,7 +186,7 @@ $(function () {
         var xCell = Math.floor(X / partX);
         var partY = $(window).height() / 50;
         var yCell = Math.floor((Y-topBorder) / partY);
-        if (yCell < 6 && yCell >=0)
+        if (yCell < 1 && yCell >=0)
         {
             if (blocks[xCell][yCell].is)
             {
@@ -183,7 +217,11 @@ $(function () {
     }
 
     function won() {
-
+        var count = Number($(".count").text());
+        started = false;
+        isWon = true;
+        $(".result").text("Your score: " + count);
+        $(".won").show();
     }
 });
 
