@@ -50,7 +50,7 @@ $(function () {
                     var $block = $("<div>");
                     $block.addClass("block");
                     $block.css("left", i * 10 + "%");
-                    $block.css("top", j * 2 * percent + this.borders.top + "px");
+                    $block.css("top", j * 4 * percent + this.borders.top + "px");
                     this.$body.append($block);
                     this.blocks[i][j] = { is: true, block: $block };               
                 }
@@ -59,55 +59,19 @@ $(function () {
 
         drop:function () {        
             this.$score.text(0);
+            this.score = 0;
             this.started = false;
             this.pause = false;
             this.isWon = false;
             this.horizontalSpeed = 0;
             this.verticalSpeed = 0;
             this.bord.$.text("Start");
-            this.ball.$.ball.hide();
-            this.ball.$.ball.css("left", ballStartX);
-            this.ball.$.ball.css("top", ballStartY);
+            this.ball.$.hide();
+            this.ball.$.css("left", this.ball.initX);
+            this.ball.$.css("top", this.ball.initY);
             this.ball.x = this.ball.initX;
             this.ball.y = this.ball.initY;
-        },
-
-        mouse:function (e) {
-            if (!this.pause)
-            {
-                var x = e.clientX;
-                this.bord.x = x - this.width / 2;
-                if (this.bord.x < 0) {
-                    this.bord.x = 0;
-                }
-                if (this.bord.x > this.borders.right - this.bord.width) {
-                    this.bord.x = this.borders.right - this.bord.width;
-                }
-                this.bord.$.css({ "left": this.bord.x + "px" });
-            }
-        },
-
-        bordClick:function(){
-            if (!this.isWon) {
-                if (this.started) {
-                    if (!this.pause) {
-                        game.bord.$.text("Resume");
-                        this.pause = true;
-                    }
-                    else {
-                        game.bord.$.text("Pause");
-                        this.pause = false;
-                        setTimeout(ballMove, this.speed)
-                    }
-                }
-                else {
-                    this.started = true;
-                    game.bord.$.text("Pause");
-                    setTimeout(ballMove, this.speed);
-                    setTimeout(function () {$ball.show();}, this.speed);
-                }
-            }
-        },
+        }      
     }
 
     function initState() {
@@ -115,43 +79,45 @@ $(function () {
         game.$body = $("body");
         game.ball.$ = $(".ball");
         game.bord.$ = $(".bord");
-        game.$score = $(".count");
+        game.$score = $(".score");
         game.$window = $(window);
          
-        //init game speed
+        //init game tick size
         game.speed = 10;
 
         //init all sizes
         initSizes();
 
-        // init ball        
-        game.ball.x = pxToNumber(gameState.ball.$.css("left"));
-        game.ball.y = pxToNumber(gameState.ball.$.css("top"));
-        game.ball.initX = gameState.ball.x;
-        game.ball.initY = gameState.ball.y;
-        game.ball.horizontalSpeed = 20;
-        game.ball.verticalSpeed = 20;       
+        // init ball  
+        game.ball.$.width(game.ball.diameter);
+        game.ball.$.height(game.ball.diameter);
+        game.ball.x = pxToNumber(game.ball.$.css("left"));
+        game.ball.y = pxToNumber(game.ball.$.css("top"));
+        game.ball.initX = game.ball.x;
+        game.ball.initY = game.ball.y;
+        game.ball.horizontalSpeed = game.height / 100;
+        game.ball.verticalSpeed = game.width / 100 / (game.width/game.height);
 
         // init bord       
-        game.bord.x = pxToNumber(gameState.bord.$.css("left"));
+        game.bord.x = pxToNumber(game.bord.$.css("left"));
               
         // init blocks
-        game.blockRows = 6;
+        game.blockRows = 1;
         game.blockCols = 10;
         game.generateBlocks();              
     }
 
     function initSizes() {
         // init window
-        game.height = gameState.$window.height();
-        game.width = gameState.$window.width();
+        game.height = game.$window.height();
+        game.width = game.$window.width();
 
         //init ball
-        game.ball.diameter = gameState.ball.$.height();
+        game.ball.diameter = ((game.height + game.width) / 2) / 36; //<- ball-size coef
 
         //init bord
-        game.bord.width = gameState.bord.$.width();
-        game.bord.height = gameState.bord.$.height();
+        game.bord.width = game.bord.$.width();
+        game.bord.height = game.bord.$.height();
 
         //init borders
         game.borders.top = 60;
@@ -160,9 +126,48 @@ $(function () {
         game.borders.left = 0;
     }
 
+    initState();
+
     window.onresize = function(event) {
         initSizes();
     };
+
+    function mouse(e) {
+        if (!game.pause)
+        {
+            var x = e.clientX;
+            game.bord.x = x - game.bord.width / 2;
+            if (game.bord.x < 0) {
+                game.bord.x = 0;
+            }
+            if (game.bord.x > game.borders.right - game.bord.width) {
+                game.bord.x = game.borders.right - game.bord.width;
+            }
+            game.bord.$.css({ "left": game.bord.x + "px" });
+        }
+    }
+
+    function bordClick(){
+        if (!game.isWon) {
+            if (game.started) {
+                if (!game.pause) {
+                    game.bord.$.text("Resume");
+                    game.pause = true;
+                }
+                else {
+                    game.bord.$.text("Pause");
+                    game.pause = false;
+                    setTimeout(ballMove, game.speed)
+                }
+            }
+            else {
+                game.started = true;
+                game.bord.$.text("Pause");
+                setTimeout(ballMove, game.speed);
+                setTimeout(function () { game.ball.$.show(); }, game.speed);
+            }
+        }
+    }
 
     function restart() {
         game.blocks.forEach(function (value, index, arr) {
@@ -177,99 +182,104 @@ $(function () {
 
     $(".restart").on("click", restart);
     $(".restart-won").on("click", restart);
-    $("*").mousemove(game.mouse);
-    game.bord.$.on("click", game.bordClick);
+    $("*").mousemove(mouse);
+    game.bord.$.on("click", bordClick);
 
     function ballMove() {       
-        var maybeX = ballX + hSpeed;
-        var maybeY = ballY + vSpeed;
-
-        checkBlock(maybeX, maybeY);
-
-        if (maybeX < leftBorder) {
-            maybeX = leftBorder;
-            hSpeed *= -1;
+        var newX = game.ball.x + game.ball.horizontalSpeed;
+        var newY = game.ball.y + game.ball.verticalSpeed;
+        checkBlock(newX, newY);
+        if (newX < game.borders.left) {
+            newX = game.borders.left;
+            game.ball.horizontalSpeed *= -1;
         }
 
-        if ((maybeX + ballDm) > rightBorder) {
-            maybeX = rightBorder - ballDm;
-            hSpeed *= -1;
+        if ((newX + game.ball.diameter) > game.borders.right) {
+            newX = game.borders.right - game.ball.diameter;
+            game.ball.horizontalSpeed *= -1;
         }
 
-        if (maybeY < topBorder) {
-            maybeY = topBorder;
-            vSpeed *= -1;
+        if (newY < game.borders.top) {
+            newY = game.borders.top;
+            game.ball.verticalSpeed *= -1;
         }
 
-        if ((maybeY) > bottomBorder) {
-            if (maybeX < (bordPosition - ballDm) || maybeX > (bordPosition + bordWidth)) {
+        if (newX >= (game.bord.x - game.ball.diameter) && newX <= (game.bord.x + game.bord.width)){
+            if (newY >= (game.borders.bottom - game.bord.height) && game.ball.verticalSpeed > 0){
+                game.ball.verticalSpeed *= -1;
+            }
+        }
+        else 
+        if (newY > game.borders.bottom) {
+            if (newX < (game.borders.bottom - game.ball.diameter) ||
+                newX > (game.bord.x + game.bord.width)) {
                 minusCount();
             }
 
-            maybeY = bottomBorder - ballDm;
-            vSpeed *= -1;
+            newY = game.borders.bottom - game.ball.diameter;
+            game.ball.verticalSpeed *= -1;
         }
 
-        ballX = maybeX;
-        ballY = maybeY;
+        game.ball.x = newX;
+        game.ball.y = newY;
 
-        $ball.css("left", ballX);
-        $ball.css("top", ballY);
+        game.ball.$.css("left", game.ball.x);
+        game.ball.$.css("top", game.ball.y);
 
-        if (!pause && started) {
-            setTimeout(ballMove, gameSpeed);
+        if (!game.pause && game.started) {
+            setTimeout(ballMove, game.speed);
         }        
     }
 
-    function checkBlock(X, Y) {
-        if (X < 0){
-            X = 0;
+    function checkBlock(x, y) {
+        if (x < 0){
+            x = 0;
         }
-        if (Y < 0) {
-            Y = 0;
+
+        if (y < 0) {
+            y = 0;
         }
         
-        var partX = $(window).width() / 10;
-        var xCell = Math.floor(X / partX);
-        var partY = $(window).height() / 50;
-        var yCell = Math.floor((Y-topBorder) / partY);
-        if (yCell < 1 && yCell >=0)
-        {
-            if (blocks[xCell][yCell].is)
-            {
-                blocks[xCell][yCell].is = false;
-                blocks[xCell][yCell].block.remove();
-                vSpeed *= -1;
-                blocksLeft--;
+        var partX = game.width / 10;
+        var xCell = Math.floor(x / partX);
+        var partY = game.height / 25;
+        var yCell = Math.floor((y-game.borders.top) / partY);
+        if (yCell < game.blockRows && yCell >= 0){
+            if (game.blocks[xCell][yCell].is){
+                game.blocks[xCell][yCell].is = false;
+                game.blocks[xCell][yCell].block.remove();
+                game.ball.verticalSpeed *= -1;
+                game.blocksLeft--;
                 plusCount();
             }
-            if (blocksLeft == 0)
-            {
+
+            if (game.blocksLeft == 0){
                 won();
             }
         }
     }
 
     function plusCount() {
-        $(".count").text(Number($(".count").text()) + 1);
+        game.score++;
+        game.$score.text(game.score);
     }
 
     function minusCount() {
-        var count = Number($(".count").text());
-        count = count - 2;
-        if (count < 0) {
-            count = 0;
+        game.score -= 2;
+        if (game.score < 0) {
+            game.score = 0;
         }
-        $(".count").text(count);
+        game.$score.text(game.score);
     }
 
-    function won() {
-        var count = Number($(".count").text());
-        started = false;
-        isWon = true;
-        $(".result").text("Your score: " + count);
+    function won() {       
+        game.started = false;
+        game.isWon = true;
+        $(".result").text("Your score: " + game.score);
         $(".won").show();
     }
+
+    
 });
 
 function pxToNumber(px) {

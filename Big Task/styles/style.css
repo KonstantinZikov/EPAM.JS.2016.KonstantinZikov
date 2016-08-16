@@ -111,13 +111,13 @@ body{
     display:none;
 }
 
-.count{
+.score{
     color:white;
 }
 
 .block{
     width:10%;
-    height:2%;
+    height:4%;
     bottom:0;
     left:0px;
     background:linear-gradient(to right bottom, #00037c, #2d4ad3);
