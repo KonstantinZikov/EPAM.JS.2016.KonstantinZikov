@@ -47,3 +47,15 @@ body{
     text-align:center;
 
 }
+
+.green{
+    background-color:#4caf50;
+}
+
+.orange{
+    background-color:#ff9800;
+}
+
+.red{
+    background-color:#f44336;
+}

@@ -63,8 +63,8 @@ $(function () {
         else {
             started = true;
             $(".bord").text("Pause");
-            hSpeed = 20;
-            vSpeed = 20;
+            hSpeed = 10;
+            vSpeed = 10;
             setTimeout(ballMove, gameSpeed);
             setTimeout(function () {
                 $ball.show();
