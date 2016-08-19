@@ -1,6 +1,5 @@
 // all static members implemented in di.js
 function Zombie() {
-    constructor = Zombie;
 
     //Create div
     this.$ = $("<div>").addClass("zombie");
