@@ -1,7 +1,7 @@
 var engine = {
     finish:false,
     maxPosition:0,
-    tick:10,
+    tick:1000,
     zombies:[],
     $lines: null,
     $gameOver:null,
@@ -11,6 +11,9 @@ var engine = {
         engine.$lines = $(".field-line");
         engine.$gameOver = $(".game-over");
         $(".button#btnGenerate").on("click", engine.generate);
+        $(".button#btnSlow").on("click", engine.slowUp);
+        $(".button#btnOld").on("click", engine.growOld);
+        $(".button#btnExplode").on("click", engine.explode);
     },
 
     start: function () {
@@ -35,6 +38,43 @@ var engine = {
         }       
     },
 
+    slowUp:function(){
+        for (var i = 0; i < engine.zombies.length; i++) {
+            engine.zombies[i].slowUp(1000);
+        }
+    },
+
+    growOldActive:false,
+    growOld: function () {
+        if (!engine.growOldActive) {
+            engine.growOldActive = true;
+            var next = true;
+            function dicreaseHealth() {
+                for (var i = 0; i < engine.zombies.length; i++) {
+                    engine.zombies[i].damage.call(engine.zombies[i], 1);
+                }
+
+                if (next) {
+                    setTimeout(dicreaseHealth, 1000);
+                }
+            }
+            dicreaseHealth();
+            setTimeout(function () {
+                next = false;
+                engine.growOldActive = false;
+            }, 10000);
+        }       
+    },
+
+    explode: function(){
+        for (var i = 0; i < engine.zombies.length; i++) {
+            engine.zombies[i].damage(15);
+            var $expl = $("<div>").addClass("explosion");
+            engine.zombies[i].$.append($expl);
+            helper($expl);
+        }
+    },
+
     gameTick: function () {
         for (var i = 0; i < engine.zombies.length; i++) {
             engine.zombies[i].move();
@@ -51,4 +91,8 @@ var engine = {
         engine.finish = true;
         engine.$gameOver.show();
     },
+}
+
+function helper(expl) {
+    setTimeout(function () { expl.remove(); }, 400);
 }
