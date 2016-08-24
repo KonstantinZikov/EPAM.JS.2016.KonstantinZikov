@@ -1,7 +1,7 @@
 var engine = {
     finish:false,
     maxPosition:0,
-    tick:1000,
+    tick:100,
     zombies:[],
     $lines: null,
     $gameOver:null,
@@ -40,7 +40,7 @@ var engine = {
 
     slowUp:function(){
         for (var i = 0; i < engine.zombies.length; i++) {
-            engine.zombies[i].slowUp(1000);
+            engine.zombies[i].slowUp(10000);
         }
     },
 
@@ -77,9 +77,11 @@ var engine = {
 
     gameTick: function () {
         for (var i = 0; i < engine.zombies.length; i++) {
-            engine.zombies[i].move();
-            if (engine.zombies[i].position + engine.zombies[i].getWidth() >= engine.maxPosition) {
-                engine.gameOver();
+            if (!engine.zombies[i].dead) {
+                engine.zombies[i].move();
+                if (engine.zombies[i].position + engine.zombies[i].getWidth() >= engine.maxPosition) {
+                    engine.gameOver();
+                }
             }
         }
         if (!engine.finish) {

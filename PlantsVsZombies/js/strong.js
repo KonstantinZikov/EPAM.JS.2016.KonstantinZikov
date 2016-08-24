@@ -1,5 +1,5 @@
 function Strong() {
     Zombie.call(this);
-    this.speed = 10;
+    this.speed = 4;
     this.$.addClass("strong");
 }

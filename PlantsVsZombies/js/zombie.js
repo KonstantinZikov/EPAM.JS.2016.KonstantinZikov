@@ -12,6 +12,7 @@ function Zombie() {
     this.health = 50;
     protected.currentHealth = this.health;
     this.position = 0;
+    this.dead = false;
 
     this.move = function () {
         this.position += this.speed;
@@ -25,7 +26,8 @@ function Zombie() {
         return this.width;
     }
 
-    function die(){
+    function die() {
+        this.dead = true;
         this.$.remove();
     }
 
